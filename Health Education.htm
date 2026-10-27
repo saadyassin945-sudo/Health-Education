@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Health Education</title>
+    <style>
+        :root {
+            --bg1: #0a0e1a; --bg2: #141e33; --primary: #00d4ff; --primary-dark: #0099cc;
+            --accent: #facc15; --danger: #f87171; --success: #34d399;
+            --card-bg: rgba(255, 255, 255, 0.04); --card-border: rgba(255, 255, 255, 0.08);
+            --text: #e8edf5; --muted: #94a3b8;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.5); --glow: 0 0 30px rgba(0, 212, 255, 0.06);
+            --radius: 16px; --header-bg: rgba(255, 255, 255, 0.03); --header-border: rgba(255, 255, 255, 0.04);
+            --footer-border: rgba(255, 255, 255, 0.03); --table-header-bg: rgba(0, 212, 255, 0.08);
+            --card-title-bg: rgba(0, 212, 255, 0.06); --highlight-bg: #facc15; --highlight-text: #0f172a;
+        }
+        [data-theme="light"] {
+            --bg1: #f0f4f8; --bg2: #e2e8f0; --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(0, 0, 0, 0.1); --text: #0f172a; --muted: #475569;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08); --glow: 0 0 30px rgba(0, 212, 255, 0.02);
+            --header-bg: rgba(255, 255, 255, 0.7); --header-border: rgba(0, 0, 0, 0.04);
+            --footer-border: rgba(0, 0, 0, 0.04); --table-header-bg: rgba(0, 212, 255, 0.12);
+            --card-title-bg: rgba(0, 212, 255, 0.08);
+        }
+        .highlight-text { background-color: var(--highlight-bg); color: var(--highlight-text); padding: 0 4px; border-radius: 4px; font-weight: bold; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, 'Cairo', sans-serif;
+            background: linear-gradient(135deg, var(--bg1), var(--bg2), #0f1a2b);
+            min-height: 100vh; color: var(--text); padding: 16px 8px;
+            display: flex; justify-content: center; align-items: flex-start;
+            transition: background 0.4s ease;
+        }
+        .app { max-width: 1100px; width: 100%; }
+        .header { text-align: center; margin-bottom: 20px; padding: 16px 16px; background: var(--header-bg); border-radius: 20px; border: 1px solid var(--header-border); backdrop-filter: blur(4px); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .header h1 { font-size: 1.8rem; font-weight: 800; color: #fff; text-shadow: 0 4px 25px rgba(0, 212, 255, 0.15); transition: color 0.3s ease; }
+        [data-theme="light"] .header h1 { color: #0f172a; text-shadow: none; }
+        .header h1 .highlight { background: linear-gradient(135deg, var(--primary), #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header .sub { color: var(--primary); font-weight: 600; letter-spacing: 1.5px; font-size: 0.8rem; margin-top: 2px; }
+        .header .creator { color: var(--muted); font-size: 0.75rem; margin-top: 4px; }
+        .header .creator .name { color: var(--text); font-weight: 700; }
+        .theme-toggle { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 50%; width: 42px; height: 42px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; color: var(--text); }
+        .theme-toggle:hover { border-color: var(--primary); background: rgba(0, 212, 255, 0.08); transform: scale(1.05); }
+        [data-theme="light"] .theme-toggle { background: rgba(0, 0, 0, 0.04); border-color: rgba(0, 0, 0, 0.06); }
+        .tabs-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; justify-content: center; }
+        .tab-btn { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 30px; padding: 8px 14px; font-size: 0.7rem; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s ease; text-align: center; line-height: 1.3; }
+        .tab-btn:hover { border-color: var(--primary); color: var(--text); }
+        .tab-btn.active { border-color: var(--primary); background: rgba(0, 212, 255, 0.08); color: var(--primary); }
+        .tab-btn .en { display: block; font-size: 0.7rem; }
+        .tab-btn .ar { display: block; font-size: 0.55rem; opacity: 0.7; }
+        .card { background: var(--card-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--card-border); border-radius: var(--radius); box-shadow: var(--shadow), var(--glow); padding: 18px 14px; margin-bottom: 16px; transition: background 0.3s ease, border 0.3s ease; display: none; }
+        .card.active { display: block; }
+        .card h2 { font-size: 1.3rem; color: var(--text); border-right: 4px solid var(--primary); padding-right: 12px; margin-bottom: 16px; font-weight: 700; }
+        .slide-container { position: relative; min-height: 300px; }
+        .slide { display: none; animation: fadeSlide 0.3s ease; }
+        .slide.active { display: block; }
+        @keyframes fadeSlide { from { opacity: 0; transform: translateX(15px); } to { opacity: 1; transform: translateX(0); } }
+        .slide-progress { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.8rem; color: var(--muted); }
+        .slide-progress .bar { flex: 1; height: 4px; background: rgba(255, 255, 255, 0.06); border-radius: 10px; margin: 0 12px; overflow: hidden; }
+        .slide-progress .bar .fill { height: 100%; background: linear-gradient(90deg, var(--primary), #818cf8); border-radius: 10px; transition: width 0.3s ease; }
+        .slide-progress .count { font-weight: 600; white-space: nowrap; }
+        .slide-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; gap: 10px; }
+        .slide-nav .btn-nav { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 30px; padding: 10px 20px; font-size: 0.9rem; font-weight: 600; color: var(--text); cursor: pointer; transition: all 0.2s ease; min-width: 80px; text-align: center; }
+        .slide-nav .btn-nav:hover:not(:disabled) { background: rgba(0, 212, 255, 0.08); border-color: var(--primary); }
+        .slide-nav .btn-nav:disabled { opacity: 0.3; cursor: default; }
+        .slide-nav .btn-nav.primary { background: var(--primary); color: #0a0e1a; border-color: var(--primary); }
+        .slide-nav .btn-nav.primary:hover:not(:disabled) { background: var(--primary-dark); border-color: var(--primary-dark); }
+        [data-theme="light"] .slide-nav .btn-nav { background: rgba(0, 0, 0, 0.02); border-color: rgba(0, 0, 0, 0.06); }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 8px; }
+        .topic-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 14px 14px 12px; transition: border-color 0.2s ease; display: flex; flex-direction: column; }
+        .topic-card:hover { border-color: var(--primary); }
+        .topic-card .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--card-title-bg); }
+        .topic-card .card-title { font-weight: 700; font-size: 0.95rem; color: var(--primary); line-height: 1.4; flex: 1; }
+        .topic-card .card-title-ar { color: var(--muted); font-weight: 400; display: none; }
+        .topic-card .card-title-ar.show { display: inline; }
+        .topic-card .card-title-en { display: inline; }
+        .topic-card .card-title-en.hidden { display: none; }
+        .topic-card .translate-btn { background: rgba(0, 212, 255, 0.08); border: 1px solid var(--card-border); border-radius: 20px; padding: 3px 12px; font-size: 0.6rem; color: var(--primary); cursor: pointer; transition: all 0.2s ease; white-space: nowrap; flex-shrink: 0; margin-right: 8px; }
+        .topic-card .translate-btn:hover { background: rgba(0, 212, 255, 0.18); border-color: var(--primary); }
+        .topic-card .translate-btn.active { background: rgba(0, 212, 255, 0.18); border-color: var(--primary); }
+        .topic-card .card-items { list-style: none; padding: 0; margin: 0; flex: 1; }
+        .topic-card .card-items li { padding: 4px 0; line-height: 1.6; border-bottom: 1px solid rgba(255, 255, 255, 0.03); }
+        [data-theme="light"] .topic-card .card-items li { border-bottom-color: rgba(0, 0, 0, 0.04); }
+        .topic-card .card-items li:last-child { border-bottom: none; }
+        .topic-card .item-en { font-weight: 600; color: var(--text); font-size: 0.9rem; line-height: 1.6; display: block; text-align: left; direction: ltr; }
+        .topic-card .item-ar { color: var(--muted); font-size: 0.82rem; line-height: 1.6; text-align: right; direction: rtl; display: none; margin-top: 2px; padding-right: 8px; border-right: 2px solid rgba(0, 212, 255, 0.2); }
+        .topic-card .item-ar.show { display: block; }
+        .topic-card .card-items.numbered { counter-reset: item-counter; }
+        .topic-card .card-items.numbered li { padding-right: 28px; position: relative; counter-increment: item-counter; }
+        .topic-card .card-items.numbered li::before { content: counter(item-counter) "-"; position: absolute; right: 2px; color: var(--primary); font-weight: 700; font-size: 0.85rem; }
+        .info-table-wrap { overflow-x: auto; margin: 12px 0; border-radius: 10px; border: 1px solid var(--card-border); grid-column: 1 / -1; }
+        .info-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 500px; }
+        .info-table th { background: var(--table-header-bg); color: var(--primary); padding: 8px 6px; text-align: center; border-bottom: 2px solid var(--primary); font-weight: 700; }
+        .info-table td { padding: 8px 6px; border-bottom: 1px solid var(--card-border); vertical-align: top; line-height: 1.5; }
+        .info-table tr:last-child td { border-bottom: none; }
+        .info-table .ar-text { border-right: none; padding-right: 0; margin-top: 2px; font-size: 0.78rem; display: block; color: var(--muted); }
+        .info-table .en-text { font-size: 0.85rem; }
+        @media (max-width: 600px) { .cards-grid { grid-template-columns: 1fr; } .info-table { font-size: 0.72rem; min-width: 350px; } .topic-card .card-title { font-size: 0.85rem; } }
+        .footer-credit { text-align: center; color: rgba(255, 255, 255, 0.12); font-size: 0.7rem; margin-top: 24px; padding: 10px 0; border-top: 1px solid var(--footer-border); }
+        [data-theme="light"] .footer-credit { color: rgba(0, 0, 0, 0.2); }
+        .footer-credit .name { color: var(--primary); font-weight: 600; }
+        @media (max-width: 768px) { body { padding: 8px 4px; } .header h1 { font-size: 1.4rem; } .tab-btn { padding: 6px 10px; font-size: 0.6rem; } .card { padding: 14px 10px; } .card h2 { font-size: 1.1rem; } }
+        .topic-card.full-width { grid-column: 1 / -1; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="header">
+            <div class="header-top">
+                <div>
+                    <h1><span class="highlight">Health Education</span></h1>
+                    <div class="sub"></div>
+                    <div class="creator">Created by <span class="name">MR. YASSIN THARWAT</span></div>
+                </div>
+                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="تبديل الوضع">☀</button>
+            </div>
+        </div>
+        <div class="tabs-wrap" id="tabsContainer"></div>
+        <div id="sectionsContainer"></div>
+        <div class="footer-credit">Created by <span class="name">MR. YASSIN THARWAT</span></div>
+    </div>
+
+    <script>
+        let currentTheme = localStorage.getItem('theme') || 'dark';
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            document.getElementById('themeToggle').textContent = theme === 'light' ? '☾' : '☀';
+            localStorage.setItem('theme', theme);
+            currentTheme = theme;
+        }
+        function toggleTheme() { applyTheme(currentTheme === 'dark' ? 'light' : 'dark'); }
+
+        let slideState = {};
+        function initSlideState(partId, totalSlides) { slideState[partId] = { current: 0, total: totalSlides }; }
+        function renderSlide(partId, containerId) {
+            const state = slideState[partId];
+            if (!state) return;
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const slides = container.querySelectorAll('.slide');
+            slides.forEach((s, i) => s.classList.toggle('active', i === state.current));
+            const progressBar = container.querySelector('.slide-progress .fill');
+            const countSpan = container.querySelector('.slide-progress .count');
+            if (progressBar) progressBar.style.width = ((state.current + 1) / state.total * 100) + '%';
+            if (countSpan) countSpan.textContent = `${state.current + 1} / ${state.total}`;
+            const prevBtn = container.querySelector('.btn-nav.prev');
+            const nextBtn = container.querySelector('.btn-nav.next');
+            if (prevBtn) prevBtn.disabled = state.current === 0;
+            if (nextBtn) nextBtn.disabled = state.current === state.total - 1;
+        }
+        function goToSlide(partId, containerId, index) {
+            const state = slideState[partId];
+            if (!state) return;
+            if (index < 0) index = 0;
+            if (index >= state.total) index = state.total - 1;
+            state.current = index;
+            renderSlide(partId, containerId);
+        }
+
+        function createSlideHTML(title, cardsHTML) {
+            return `<div class="slide"><h3 style="font-size:1.1rem; color:var(--primary); margin-bottom:12px; border-right:3px solid var(--primary); padding-right:10px;">${title}</h3><div class="cards-grid">${cardsHTML}</div></div>`;
+        }
+        function card(title, items, arTitle = '') {
+            const cardId = 'c' + Math.random().toString(36).substr(2, 8);
+            const itemsHTML = items.map((item) => {
+                const en = item.en || item;
+                const ar = item.ar || '';
+                return `<li><span class="item-en">${en}</span><span class="item-ar">${ar}</span></li>`;
+            }).join('');
+            const listClass = items.some(i => i.en && i.en.match(/^\d/)) ? 'card-items numbered' : 'card-items simple';
+            return `<div class="topic-card" data-card="${cardId}"><div class="card-header"><span class="card-title"><span class="card-title-en">${title}</span><span class="card-title-ar" id="${cardId}-title-ar">${arTitle}</span></span><button class="translate-btn" data-card="${cardId}" onclick="toggleCardTranslation('${cardId}')">ترجمة</button></div><ul class="${listClass}">${itemsHTML}</ul></div>`;
+        }
+        function tableCard(title, tableHTML, arTitle = '') {
+            return `<div class="topic-card full-width"><div class="card-header"><span class="card-title"><span class="card-title-en">${title}</span><span class="card-title-ar" style="display:block;">${arTitle}</span></span></div><div class="info-table-wrap">${tableHTML}</div></div>`;
+        }
+        function cell(en, ar) { return `<span class="en-text">${en}</span><span class="ar-text">${ar}</span>`; }
+        function toggleCardTranslation(cardId) {
+            const card = document.querySelector(`.topic-card[data-card="${cardId}"]`);
+            if (!card) return;
+            const arItems = card.querySelectorAll('.item-ar');
+            const titleAr = document.getElementById(`${cardId}-title-ar`);
+            const titleEn = card.querySelector('.card-title-en');
+            const btn = card.querySelector('.translate-btn');
+            const isVisible = arItems.length > 0 && arItems[0].classList.contains('show');
+            arItems.forEach(el => el.classList.toggle('show'));
+            if (titleAr) { titleAr.classList.toggle('show'); if (titleEn) titleEn.classList.toggle('hidden'); }
+            if (btn) { btn.textContent = isVisible ? 'ترجمة' : 'إخفاء'; btn.classList.toggle('active'); }
+        }
+
+        // ============================================================
+        //  DATA: HEALTH EDUCATION
+        // ============================================================
+        const healthEdData = {
+            titleEn: 'Lecture 1',
+            titleAr: 'المحاضرة الأولى',
+            slides: [
+                // ---------- SLIDE 1 ----------
+                {
+                    title: 'Introduction & Definitions · المقدمة والتعريفات',
+                    cards: [
+                        card('Introduction · المقدمة', [
+                            { en: 'Health education is an <span class="highlight-text">essential component of nursing and public health</span> that helps individuals, families, and communities improve their health knowledge, attitudes, and practices.', ar: 'التثقيف الصحي هو <span class="highlight-text">مكون أساسي في التمريض والصحة العامة</span> يساعد الأفراد والأسر والمجتمعات على تحسين معارفهم ومواقفهم وممارساتهم الصحية.' },
+                            { en: 'It makes people <span class="highlight-text">change their ill life habits and behaviors</span> and motivate them towards forming healthy habits.', ar: 'يجعل الناس <span class="highlight-text">يغيّرون عاداتهم وأنماط حياتهم السيئة</span> ويحفزهم لتكوين عادات صحية.' }
+                        ], 'المقدمة:'),
+                        card('Definition of Health Education · تعريف التثقيف الصحي', [
+                            { en: 'A <span class="highlight-text">planned process of teaching and learning</span> that helps people acquire knowledge, develop positive attitudes, and adopt healthy behaviors.', ar: '<span class="highlight-text">عملية تعليم وتعلم مخططة</span> تساعد الناس على اكتساب المعرفة وتطوير مواقف إيجابية وتبني سلوكيات صحية.' },
+                            { en: 'It is <span class="highlight-text">not simply giving information</span>; rather, it aims to encourage people to make <span class="highlight-text">voluntary decisions</span> that improve their health.', ar: '<span class="highlight-text">ليس مجرد إعطاء معلومات</span>؛ بل يهدف إلى تشجيع الناس على اتخاذ <span class="highlight-text">قرارات طوعية</span> تحسن صحتهم.' }
+                        ], 'تعريف التثقيف الصحي:'),
+                        card('Health Education Empowers Individuals · التثقيف الصحي يمكّن الأفراد من', [
+                            { en: '1. <span class="highlight-text">Understand their health status</span>.', ar: '1. <span class="highlight-text">فهم حالتهم الصحية</span>.' },
+                            { en: '2. <span class="highlight-text">Recognize factors</span> that affect their health.', ar: '2. <span class="highlight-text">التعرف على العوامل</span> التي تؤثر على صحتهم.' },
+                            { en: '3. <span class="highlight-text">Prevent diseases</span> and complications.', ar: '3. <span class="highlight-text">الوقاية من الأمراض</span> والمضاعفات.' },
+                            { en: '4. Adopt <span class="highlight-text">healthy lifestyles</span>.', ar: '4. تبني <span class="highlight-text">أنماط حياة صحية</span>.' },
+                            { en: '5. Make <span class="highlight-text">informed health decisions</span>.', ar: '5. اتخاذ <span class="highlight-text">قرارات صحية مستنيرة</span>.' }
+                        ], 'التمكين:'),
+                        card('Patient Education · تعليم المريض', [
+                            { en: 'A term for education in <span class="highlight-text">hospital and clinic settings</span> linked to following treatment procedures, medication, home care, and rehabilitation procedures.', ar: 'مصطلح يشير إلى التعليم في <span class="highlight-text">بيئات المستشفيات والعيادات</span> المرتبط باتباع إجراءات العلاج والأدوية والرعاية المنزلية وإجراءات التأهيل.' }
+                        ], 'تعليم المريض:')
+                    ]
+                },
+                // ---------- SLIDE 2 ----------
+                {
+                    title: 'Importance of Health Education · أهمية التثقيف الصحي',
+                    cards: [
+                        card('1. Promotes Healthy Living · تعزيز الحياة الصحية', [
+                            { en: 'Encourages healthy habits such as <span class="highlight-text">balanced nutrition, exercise, personal hygiene, and adequate sleep</span>.', ar: 'يشجع العادات الصحية مثل <span class="highlight-text">التغذية المتوازنة والرياضة والنظافة الشخصية والنوم الكافي</span>.' },
+                            { en: 'Example: Teaching school children the importance of <span class="highlight-text">hand washing</span> can reduce infectious diseases.', ar: 'مثال: تعليم أطفال المدارس أهمية <span class="highlight-text">غسل اليدين</span> يمكن أن يقلل من الأمراض المعدية.' }
+                        ], '1. تعزيز الحياة الصحية:'),
+                        card('2. Prevents Disease · الوقاية من الأمراض', [
+                            { en: 'Helps people understand <span class="highlight-text">risk factors and preventive measures</span>.', ar: 'يساعد الناس على فهم <span class="highlight-text">عوامل الخطر والتدابير الوقائية</span>.' },
+                            { en: 'Example: Educating adults about <span class="highlight-text">hypertension risk factors</span> may prevent cardiovascular diseases.', ar: 'مثال: تثقيف البالغين حول <span class="highlight-text">عوامل خطر ارتفاع ضغط الدم</span> قد يمنع أمراض القلب والأوعية الدموية.' }
+                        ], '2. الوقاية من الأمراض:'),
+                        card('3. Improves Quality of Life · تحسين جودة الحياة', [
+                            { en: 'People who understand health issues are better able to maintain <span class="highlight-text">physical, mental, and social wellbeing</span>.', ar: 'الأشخاص الذين يفهمون القضايا الصحية يكونون أقدر على الحفاظ على <span class="highlight-text">الرفاهية الجسدية والعقلية والاجتماعية</span>.' }
+                        ], '3. تحسين جودة الحياة:'),
+                        card('4. Encourages Early Detection · تشجيع الكشف المبكر', [
+                            { en: 'Increases awareness about <span class="highlight-text">health screening and regular checkups</span>.', ar: 'يزيد الوعي حول <span class="highlight-text">الفحص الصحي والفحوصات الدورية</span>.' },
+                            { en: 'Example: Health education about <span class="highlight-text">breast cancer</span> encourages women to perform <span class="highlight-text">breast self-examination</span>.', ar: 'مثال: التثقيف الصحي حول <span class="highlight-text">سرطان الثدي</span> يشجع النساء على إجراء <span class="highlight-text">الفحص الذاتي للثدي</span>.' }
+                        ], '4. الكشف المبكر:'),
+                        card('5. Reduces Healthcare Costs · تقليل تكاليف الرعاية الصحية', [
+                            { en: '<span class="highlight-text">Prevention is less expensive than treatment</span>.', ar: '<span class="highlight-text">الوقاية أقل تكلفة من العلاج</span>.' },
+                            { en: 'Healthy behaviors reduce <span class="highlight-text">hospital admissions and medical expenses</span>.', ar: 'السلوكيات الصحية تقلل من <span class="highlight-text">دخول المستشفيات والنفقات الطبية</span>.' }
+                        ], '5. تقليل التكاليف:')
+                    ]
+                },
+                // ---------- SLIDE 3 ----------
+                {
+                    title: 'Objectives of Health Education · أهداف التثقيف الصحي',
+                    cards: [
+                        card('General Objectives · الأهداف العامة', [
+                            { en: 'To make <span class="highlight-text">health and quality respected</span> by the community.', ar: 'جعل <span class="highlight-text">الصحة والجودة محترمة</span> من قبل المجتمع.' },
+                            { en: 'To encourage behavior that <span class="highlight-text">promotes and maintains health</span>.', ar: 'تشجيع السلوك الذي <span class="highlight-text">يعزز ويحافظ على الصحة</span>.' },
+                            { en: 'To encourage <span class="highlight-text">appropriate use of health services</span>.', ar: 'تشجيع <span class="highlight-text">الاستخدام المناسب للخدمات الصحية</span>.' },
+                            { en: 'To <span class="highlight-text">translate knowledge into interventions</span> and strategies for health improvement, disease prevention, and chronic illness management.', ar: '<span class="highlight-text">ترجمة المعرفة إلى تدخلات</span> واستراتيجيات لتحسين الصحة والوقاية من الأمراض وإدارة الأمراض المزمنة.' }
+                        ], 'الأهداف العامة:'),
+                        card('Specific Objectives · الأهداف المحددة', [
+                            { en: '1. <span class="highlight-text">Increase Knowledge</span>: provide accurate information about health and disease; help people understand causes, symptoms, prevention, and treatment.', ar: '1. <span class="highlight-text">زيادة المعرفة</span>: توفير معلومات دقيقة عن الصحة والمرض؛ مساعدة الناس على فهم الأسباب والأعراض والوقاية والعلاج.' },
+                            { en: '2. <span class="highlight-text">Influence Attitudes</span>: develop positive attitudes toward healthy behaviors; encourage acceptance of health recommendations.', ar: '2. <span class="highlight-text">التأثير على المواقف</span>: تطوير مواقف إيجابية تجاه السلوكيات الصحية؛ تشجيع قبول التوصيات الصحية.' },
+                            { en: '3. <span class="highlight-text">Promote Healthy Practices</span>: motivate individuals to adopt healthy lifestyles (exercise, nutrition, hygiene).', ar: '3. <span class="highlight-text">تعزيز الممارسات الصحية</span>: تحفيز الأفراد على تبني أنماط حياة صحية (الرياضة، التغذية، النظافة).' },
+                            { en: '4. <span class="highlight-text">Develop Skills</span>: enable people to perform health activities properly (breast self-exam, hand washing, insulin administration).', ar: '4. <span class="highlight-text">تطوير المهارات</span>: تمكين الناس من أداء الأنشطة الصحية بشكل صحيح (الفحص الذاتي للثدي، غسل اليدين، إعطاء الأنسولين).' },
+                            { en: '5. <span class="highlight-text">Encourage Community Participation</span>: involve community members in solving health problems; promote responsibility for community health.', ar: '5. <span class="highlight-text">تشجيع مشاركة المجتمع</span>: إشراك أفراد المجتمع في حل المشاكل الصحية؛ تعزيز المسؤولية عن صحة المجتمع.' }
+                        ], 'الأهداف المحددة:'),
+                        card('Example: Diabetes Education Program · مثال: برنامج تثقيف السكري', [
+                            { en: '<span class="highlight-text">Increase knowledge</span> about diabetes.', ar: '<span class="highlight-text">زيادة المعرفة</span> حول مرض السكري.' },
+                            { en: 'Create a <span class="highlight-text">positive attitude</span> toward blood glucose monitoring.', ar: 'خلق <span class="highlight-text">موقف إيجابي</span> تجاه مراقبة جلوكوز الدم.' },
+                            { en: 'Teach correct <span class="highlight-text">foot care techniques</span>.', ar: 'تعليم <span class="highlight-text">تقنيات العناية بالقدم</span> الصحيحة.' },
+                            { en: 'Encourage <span class="highlight-text">adherence to treatment plans</span>.', ar: 'تشجيع <span class="highlight-text">الالتزام بخطط العلاج</span>.' }
+                        ], 'مثال:')
+                    ]
+                },
+                // ---------- SLIDE 4 ----------
+                {
+                    title: 'Stages of Health Education · مراحل التثقيف الصحي',
+                    cards: [
+                        card('1. Awareness · الوعي', [
+                            { en: 'Means to <span class="highlight-text">know about health-related facts</span>.', ar: 'يعني <span class="highlight-text">معرفة الحقائق المتعلقة بالصحة</span>.' },
+                            { en: 'In this stage, the health educator will <span class="highlight-text">provide health education</span> and the client will <span class="highlight-text">listen first</span>.', ar: 'في هذه المرحلة، يقدم المثقف الصحي <span class="highlight-text">التثقيف الصحي</span> ويستمع العميل <span class="highlight-text">أولاً</span>.' }
+                        ], '1. الوعي:'),
+                        card('2. Interest · الاهتمام', [
+                            { en: 'In this stage, clients will be <span class="highlight-text">motivated</span> and then only they will show the interest to know in details of health-related behavior.', ar: 'في هذه المرحلة، يتم <span class="highlight-text">تحفيز</span> العملاء وعندها فقط يُظهرون الاهتمام بمعرفة تفاصيل السلوك الصحي.' }
+                        ], '2. الاهتمام:'),
+                        card('3. Evaluation · التقييم', [
+                            { en: 'The client will <span class="highlight-text">analyze the advantages and disadvantages</span> of the health education provided.', ar: 'يقوم العميل <span class="highlight-text">بتحليل مزايا وعيوب</span> التثقيف الصحي المقدم.' },
+                            { en: 'They also analyze the <span class="highlight-text">barriers</span> for practicing the health behavior.', ar: 'كما يحللون <span class="highlight-text">العوائق</span> أمام ممارسة السلوك الصحي.' }
+                        ], '3. التقييم:'),
+                        card('4. Trial · التجربة', [
+                            { en: 'When they feel health behavior has <span class="highlight-text">more advantages</span>, then they will be well motivated and try to make it a practice.', ar: 'عندما يشعرون أن السلوك الصحي له <span class="highlight-text">مزايا أكثر</span>، يكونون محفزين جيداً ويحاولون ممارسته.' }
+                        ], '4. التجربة:'),
+                        card('5. Adoption · التبني', [
+                            { en: 'After practicing the health-related behavior, the <span class="highlight-text">healthy habit will be formed</span>.', ar: 'بعد ممارسة السلوك الصحي، <span class="highlight-text">تتشكل العادة الصحية</span>.' }
+                        ], '5. التبني:')
+                    ]
+                },
+                // ---------- SLIDE 5 ----------
+                {
+                    title: 'Settings for Health Education · إعدادات التثقيف الصحي',
+                    cards: [
+                        card('1. Healthcare Settings · إعدادات الرعاية الصحية', [
+                            { en: '<span class="highlight-text">Hospitals</span>.', ar: '<span class="highlight-text">المستشفيات</span>.' },
+                            { en: '<span class="highlight-text">Clinics</span>.', ar: '<span class="highlight-text">العيادات</span>.' },
+                            { en: '<span class="highlight-text">Health centers</span>.', ar: '<span class="highlight-text">المراكز الصحية</span>.' },
+                            { en: '<span class="highlight-text">Maternal and child health centers</span>.', ar: '<span class="highlight-text">مراكز صحة الأم والطفل</span>.' },
+                            { en: 'Example: Teaching diabetic patients about <span class="highlight-text">insulin injection techniques</span> in a clinic.', ar: 'مثال: تعليم مرضى السكري <span class="highlight-text">تقنيات حقن الأنسولين</span> في العيادة.' }
+                        ], '1. إعدادات الرعاية الصحية:'),
+                        card('2. Educational Settings · الإعدادات التعليمية', [
+                            { en: '<span class="highlight-text">Schools</span>.', ar: '<span class="highlight-text">المدارس</span>.' },
+                            { en: '<span class="highlight-text">Universities</span>.', ar: '<span class="highlight-text">الجامعات</span>.' },
+                            { en: '<span class="highlight-text">Training institutes</span>.', ar: '<span class="highlight-text">معاهد التدريب</span>.' },
+                            { en: 'Example: Teaching students about <span class="highlight-text">personal hygiene</span>.', ar: 'مثال: تعليم الطلاب <span class="highlight-text">النظافة الشخصية</span>.' }
+                        ], '2. الإعدادات التعليمية:'),
+                        card('3. Community Settings · إعدادات المجتمع', [
+                            { en: '<span class="highlight-text">Community centers</span>.', ar: '<span class="highlight-text">المراكز المجتمعية</span>.' },
+                            { en: '<span class="highlight-text">Mosques, churches</span>.', ar: '<span class="highlight-text">المساجد والكنائس</span>.' },
+                            { en: '<span class="highlight-text">Youth clubs</span>.', ar: '<span class="highlight-text">نوادي الشباب</span>.' },
+                            { en: '<span class="highlight-text">Village meeting halls</span>.', ar: '<span class="highlight-text">قاعات اجتماعات القرى</span>.' },
+                            { en: 'Example: Organizing a campaign about <span class="highlight-text">smoking cessation</span>.', ar: 'مثال: تنظيم حملة حول <span class="highlight-text">الإقلاع عن التدخين</span>.' }
+                        ], '3. إعدادات المجتمع:'),
+                        card('4. Home Setting · إعداد المنزل', [
+                            { en: '<span class="highlight-text">Home visits</span> conducted by community health nurses.', ar: '<span class="highlight-text">الزيارات المنزلية</span> التي يقوم بها ممرضو صحة المجتمع.' },
+                            { en: 'Example: Teaching a family how to care for an <span class="highlight-text">elderly patient at home</span>.', ar: 'مثال: تعليم الأسرة كيفية رعاية <span class="highlight-text">مريض مسن في المنزل</span>.' }
+                        ], '4. إعداد المنزل:'),
+                        card('5. Workplace Setting · إعداد مكان العمل', [
+                            { en: '<span class="highlight-text">Factories</span>.', ar: '<span class="highlight-text">المصانع</span>.' },
+                            { en: '<span class="highlight-text">Companies</span>.', ar: '<span class="highlight-text">الشركات</span>.' },
+                            { en: '<span class="highlight-text">Government institutions</span>.', ar: '<span class="highlight-text">المؤسسات الحكومية</span>.' },
+                            { en: 'Example: <span class="highlight-text">Occupational health education</span> regarding workplace safety.', ar: 'مثال: <span class="highlight-text">التثقيف الصحي المهني</span> بخصوص السلامة في مكان العمل.' }
+                        ], '5. إعداد مكان العمل:')
+                    ]
+                },
+                // ---------- SLIDE 6 ----------
+                {
+                    title: 'Content of Health Education · محتوى التثقيف الصحي',
+                    cards: [
+                        card('1. Personal Health · الصحة الشخصية', [
+                            { en: '<span class="highlight-text">Human</span>: normal structure and function of the body.', ar: '<span class="highlight-text">الإنسان</span>: البنية والوظيفة الطبيعية للجسم.' },
+                            { en: '<span class="highlight-text">Personal hygiene</span>: personal and environmental hygiene, healthful living, regular health examinations, early correction of defects, protection of water and safe disposal of refuse.', ar: '<span class="highlight-text">النظافة الشخصية</span>: النظافة الشخصية والبيئية، الحياة الصحية، الفحوصات الصحية المنتظمة، التصحيح المبكر للعيوب، حماية المياه والتخلص الآمن من النفايات.' },
+                            { en: '<span class="highlight-text">Nutrition</span>: nutrition needs at all ages, prevention of deficiency diseases, selection and cooking of food.', ar: '<span class="highlight-text">التغذية</span>: احتياجات التغذية في جميع الأعمار، الوقاية من أمراض النقص، اختيار وطهي الطعام.' },
+                            { en: '<span class="highlight-text">Exercise, Sleep and rest</span>.', ar: '<span class="highlight-text">الرياضة والنوم والراحة</span>.' },
+                            { en: '<span class="highlight-text">Family Welfare</span>: family health, family planning, service childcare, maternal care etc.', ar: '<span class="highlight-text">رعاية الأسرة</span>: صحة الأسرة، تنظيم الأسرة، خدمات رعاية الأطفال، رعاية الأمومة، إلخ.' }
+                        ], '1. الصحة الشخصية:'),
+                        card('2. Disease Prevention · الوقاية من الأمراض', [
+                            { en: '<span class="highlight-text">Mode of transmission</span>.', ar: '<span class="highlight-text">طريقة الانتقال</span>.' },
+                            { en: '<span class="highlight-text">Immunization</span>.', ar: '<span class="highlight-text">التحصين</span>.' },
+                            { en: '<span class="highlight-text">Treatment and prevention</span>.', ar: '<span class="highlight-text">العلاج والوقاية</span>.' },
+                            { en: '<span class="highlight-text">Infection control</span>.', ar: '<span class="highlight-text">مكافحة العدوى</span>.' },
+                            { en: '<span class="highlight-text">Screening programs</span>.', ar: '<span class="highlight-text">برامج الفحص</span>.' }
+                        ], '2. الوقاية من الأمراض:'),
+                        card('3. Family Welfare · رعاية الأسرة', [
+                            { en: '<span class="highlight-text">Family health</span>.', ar: '<span class="highlight-text">صحة الأسرة</span>.' },
+                            { en: '<span class="highlight-text">Family planning</span>.', ar: '<span class="highlight-text">تنظيم الأسرة</span>.' },
+                            { en: '<span class="highlight-text">Childcare services</span>.', ar: '<span class="highlight-text">خدمات رعاية الأطفال</span>.' },
+                            { en: '<span class="highlight-text">Maternal care</span>.', ar: '<span class="highlight-text">رعاية الأمومة</span>.' }
+                        ], '3. رعاية الأسرة:'),
+                        card('4. Mental Health · الصحة النفسية', [
+                            { en: '<span class="highlight-text">Maintenance of mental health</span>.', ar: '<span class="highlight-text">الحفاظ على الصحة النفسية</span>.' },
+                            { en: '<span class="highlight-text">Health attitudes</span>.', ar: '<span class="highlight-text">المواقف الصحية</span>.' },
+                            { en: '<span class="highlight-text">Stress management</span>.', ar: '<span class="highlight-text">إدارة التوتر</span>.' },
+                            { en: '<span class="highlight-text">Coping skills</span>.', ar: '<span class="highlight-text">مهارات التكيف</span>.' },
+                            { en: '<span class="highlight-text">Emotional wellbeing</span>.', ar: '<span class="highlight-text">الرفاهية العاطفية</span>.' }
+                        ], '4. الصحة النفسية:'),
+                        card('5. School Health · صحة المدرسة', [
+                            { en: '<span class="highlight-text">Personal hygiene</span>.', ar: '<span class="highlight-text">النظافة الشخصية</span>.' },
+                            { en: '<span class="highlight-text">Good food</span>.', ar: '<span class="highlight-text">الغذاء الجيد</span>.' },
+                            { en: '<span class="highlight-text">Prevention of communicable diseases</span>.', ar: '<span class="highlight-text">الوقاية من الأمراض المعدية</span>.' }
+                        ], '5. صحة المدرسة:'),
+                        card('6. Prevention of Accidents · الوقاية من الحوادث', [
+                            { en: 'In <span class="highlight-text">homes, hospitals, schools, and industries</span>.', ar: 'في <span class="highlight-text">المنازل والمستشفيات والمدارس والصناعات</span>.' },
+                            { en: 'Health hazards due to <span class="highlight-text">physical, biological, and mechanical causes</span> and ways to prevent them.', ar: 'المخاطر الصحية بسبب <span class="highlight-text">أسباب فيزيائية وبيولوجية وميكانيكية</span> وطرق الوقاية منها.' }
+                        ], '6. الوقاية من الحوادث:'),
+                        card('7. Use of Health Services · استخدام الخدمات الصحية', [
+                            { en: '<span class="highlight-text">Where available</span>, <span class="highlight-text">when</span>, and <span class="highlight-text">how</span> to make use of services.', ar: '<span class="highlight-text">أين تتوفر</span> الخدمات، <span class="highlight-text">ومتى</span>، <span class="highlight-text">وكيف</span> يمكن الاستفادة منها.' }
+                        ], '7. استخدام الخدمات الصحية:'),
+                        card('8. Environmental Health · الصحة البيئية', [
+                            { en: '<span class="highlight-text">Safe water</span>.', ar: '<span class="highlight-text">المياه الآمنة</span>.' },
+                            { en: '<span class="highlight-text">Waste disposal</span>.', ar: '<span class="highlight-text">التخلص من النفايات</span>.' },
+                            { en: '<span class="highlight-text">Pollution control</span>.', ar: '<span class="highlight-text">مكافحة التلوث</span>.' }
+                        ], '8. الصحة البيئية:')
+                    ]
+                },
+                // ---------- SLIDE 7 ----------
+                {
+                    title: 'Steps, Approaches & Characteristics · الخطوات والمناهج وخصائص المثقف الصحي',
+                    cards: [
+                        card('Steps of Patient Education · خطوات تعليم المريض', [
+                            { en: '1. <span class="highlight-text">Assessment</span>: define patient and family needs and concerns, observe readiness to learn.', ar: '1. <span class="highlight-text">التقييم</span>: تحديد احتياجات المريض والأسرة ومخاوفهم، ومراقبة الاستعداد للتعلم.' },
+                            { en: '2. <span class="highlight-text">Design of the instruction plan</span>: set objectives with your patient, select materials.', ar: '2. <span class="highlight-text">تصميم خطة التعليم</span>: تحديد الأهداف مع المريض، واختيار المواد.' },
+                            { en: '3. <span class="highlight-text">Select teaching strategies and resources</span>: put the plan in motion, help patients reach objectives.', ar: '3. <span class="highlight-text">اختيار استراتيجيات وموارد التعليم</span>: تنفيذ الخطة، ومساعدة المرضى للوصول إلى الأهداف.' },
+                            { en: '4. <span class="highlight-text">Go teach the patient</span>: understand and adapt to barriers to learning.', ar: '4. <span class="highlight-text">تعليم المريض</span>: فهم والتكيف مع عوائق التعلم.' },
+                            { en: '5. <span class="highlight-text">Evaluate</span>: evaluation is critical and should be continuous through all four steps.', ar: '5. <span class="highlight-text">التقييم</span>: التقييم حاسم ويجب أن يكون مستمراً خلال جميع الخطوات الأربع.' }
+                        ], 'خطوات تعليم المريض:'),
+                        card('Approaches of Health Education · مناهج التثقيف الصحي', [
+                            { en: '<span class="highlight-text">Individual level</span>.', ar: '<span class="highlight-text">المستوى الفردي</span>.' },
+                            { en: '<span class="highlight-text">Group level</span>.', ar: '<span class="highlight-text">مستوى المجموعة</span>.' },
+                            { en: '<span class="highlight-text">Mass level</span>.', ar: '<span class="highlight-text">المستوى الجماهيري</span>.' },
+                            { en: '<span class="highlight-text">Community organization</span>.', ar: '<span class="highlight-text">تنظيم المجتمع</span>.' },
+                            { en: '<span class="highlight-text">Hybrid education</span>.', ar: '<span class="highlight-text">التعليم المختلط</span>.' }
+                        ], 'مناهج التثقيف الصحي:'),
+                        card('Characteristics of Health Educator (1) · خصائص المثقف الصحي (1)', [
+                            { en: 'Be familiar with <span class="highlight-text">traditions and popular customs</span> of the society.', ar: 'أن يكون على دراية <span class="highlight-text">بالتقاليد والعادات الشعبية</span> للمجتمع.' },
+                            { en: '<span class="highlight-text">Knowledgeable</span>: good knowledge and experience; sound understanding of health topics; provides accurate and updated information.', ar: '<span class="highlight-text">واسع المعرفة</span>: معرفة وخبرة جيدة؛ فهم سليم للموضوعات الصحية؛ يقدم معلومات دقيقة ومحدثة.' },
+                            { en: '<span class="highlight-text">Good Communicator</span>: good communication skills; speaks clearly and simply; uses language appropriate to the audience.', ar: '<span class="highlight-text">متواصل جيد</span>: مهارات تواصل جيدة؛ يتحدث بوضوح وبساطة؛ يستخدم لغة مناسبة للجمهور.' },
+                            { en: '<span class="highlight-text">Avoid scientific terms</span>.', ar: '<span class="highlight-text">تجنب المصطلحات العلمية</span>.' },
+                            { en: '<span class="highlight-text">Accepting error</span>.', ar: '<span class="highlight-text">تقبل الخطأ</span>.' }
+                        ], 'خصائص المثقف الصحي (1):'),
+                        card('Characteristics of Health Educator (2) · خصائص المثقف الصحي (2)', [
+                            { en: 'Be a <span class="highlight-text">good example</span> for the message of health education.', ar: 'أن يكون <span class="highlight-text">قدوة حسنة</span> لرسالة التثقيف الصحي.' },
+                            { en: '<span class="highlight-text">Respect and acknowledge</span> the rights of others to hold diverse values, attitudes, and opinions.', ar: '<span class="highlight-text">يحترم ويعترف</span> بحقوق الآخرين في حمل قيم ومواقف وآراء متنوعة.' },
+                            { en: 'Focuses on <span class="highlight-text">clear health goals</span>.', ar: 'يركز على <span class="highlight-text">أهداف صحية واضحة</span>.' },
+                            { en: '<span class="highlight-text">Good listener</span>: encourages questions; understands learners\' concerns and needs.', ar: '<span class="highlight-text">مستمع جيد</span>: يشجع الأسئلة؛ يفهم مخاوف واحتياجات المتعلمين.' },
+                            { en: '<span class="highlight-text">Culturally sensitive</span>: respects cultural, religious, and social differences.', ar: '<span class="highlight-text">حساس ثقافياً</span>: يحترم الاختلافات الثقافية والدينية والاجتماعية.' }
+                        ], 'خصائص المثقف الصحي (2):')
+                    ]
+                }
+            ]
+        };
+
+        const slidesData = { healthEd: healthEdData };
+        const sectionOrder = ['healthEd'];
+
+        function renderSlideContent(slide) {
+            if (slide.cards && Array.isArray(slide.cards)) {
+                return createSlideHTML(slide.title, slide.cards.join(''));
+            }
+            return createSlideHTML(slide.title, '');
+        }
+        function buildApp() {
+            const tabsContainer = document.getElementById('tabsContainer');
+            const sectionsContainer = document.getElementById('sectionsContainer');
+            sectionOrder.forEach((secId) => {
+                const sec = slidesData[secId];
+                if (!sec) return;
+                const tab = document.createElement('button');
+                tab.className = 'tab-btn active';
+                tab.innerHTML = `<span class="en">${sec.titleEn}</span><span class="ar">${sec.titleAr}</span>`;
+                tabsContainer.appendChild(tab);
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card active';
+                cardEl.id = `section-${secId}`;
+                const slidesHTML = sec.slides.map(s => renderSlideContent(s)).join('');
+                const totalSlides = sec.slides.length;
+                cardEl.innerHTML = `
+                    <h2>${sec.titleEn} · ${sec.titleAr}</h2>
+                    <div class="slide-container" id="slideContainer-${secId}">
+                        <div class="slide-progress">
+                            <span style="font-weight:600;">التقدم</span>
+                            <div class="bar"><div class="fill" style="width:0%;"></div></div>
+                            <span class="count">1 / ${totalSlides}</span>
+                        </div>
+                        ${slidesHTML}
+                        <div class="slide-nav">
+                            <button class="btn-nav prev" onclick="goToSlide('${secId}', 'slideContainer-${secId}', slideState['${secId}'].current - 1)">السابق</button>
+                            <button class="btn-nav next primary" onclick="goToSlide('${secId}', 'slideContainer-${secId}', slideState['${secId}'].current + 1)">التالي</button>
+                        </div>
+                    </div>`;
+                sectionsContainer.appendChild(cardEl);
+                initSlideState(secId, totalSlides);
+                setTimeout(() => renderSlide(secId, `slideContainer-${secId}`), 50);
+            });
+        }
+
+        applyTheme(localStorage.getItem('theme') || 'dark');
+        buildApp();
+
+        window.goToSlide = goToSlide;
+        window.slideState = slideState;
+        window.toggleTheme = toggleTheme;
+        window.toggleCardTranslation = toggleCardTranslation;
+    </script>
+</body>
+</html>
